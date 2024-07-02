@@ -6,7 +6,6 @@ import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
-import { pull } from "langchain/hub";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
@@ -46,7 +45,18 @@ import {
 
   // Retrieve and generate using the relevant snippets of the blog.
   const retriever = vectorStore.asRetriever();
-  const prompt = await pull<ChatPromptTemplate>("rlm/rag-prompt");
+  // custom RAG prompt
+  const template = `Use the following pieces of context to answer the question at the end.
+  If you don't know the answer, just say that you don't know, don't try to make up an answer.
+  Use three sentences maximum and keep the answer as concise as possible.
+  Always say "thanks for asking!" at the end of the answer.
+
+  {context}
+
+  Question: {question}
+
+  Helpful Answer:`;
+  const prompt = ChatPromptTemplate.fromTemplate(template)
 
   const declarativeRagChain = RunnableSequence.from([
     {
