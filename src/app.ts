@@ -1,9 +1,10 @@
 import "dotenv/config";
+import "pdf-parse";
 
 import { HuggingFaceInference } from "@langchain/community/llms/hf";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 
-import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
@@ -23,9 +24,7 @@ import {
   });
   const embeddings = new HuggingFaceInferenceEmbeddings();
 
-  const loader = new CheerioWebBaseLoader(
-    "https://js.langchain.com/v0.2/docs/introduction/"
-  );
+  const loader = new PDFLoader("document.pdf");
 
   console.log("Loading documents...");
   const docs = await loader.load();
@@ -69,6 +68,6 @@ import {
   ]);
 
   console.log("Asking question...");
-  const res = await declarativeRagChain.invoke("What is langchain?");
+  const res = await declarativeRagChain.invoke("What is the content of the context pieces about?");
   console.log(res);
 })();
